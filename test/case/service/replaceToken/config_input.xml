@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Configuration>
+    <Config>
+        <id>1</id>
+        <description>Database Configuration ${root.db.host}</description>
+        <properties>
+            <value name="host">${root.db.host}</value>
+            <value name="port">${root.db.port}</value>
+            <value name="server">${root.db.server}</value>
+            <value name="database">${root.db.database}</value>
+        </properties>
+    </Config>
+    <Config>
+        <id>2</id>
+        <description>Java</description>
+        <properties>
+            <value name="ENV_TYPE">${root.env.type}</value>
+        </properties>
+    </Config>
+</Configuration>

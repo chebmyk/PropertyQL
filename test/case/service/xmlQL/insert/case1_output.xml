@@ -1,0 +1,13 @@
+<?xml version="1.0" ?>
+<Properties>
+    <!-- Property with code = SERVICE CODE -->
+    <Property Code="SERVICE">
+        <Value Active="Y">property_value_1</Value>
+        <Value Active="Y">new_custom_property_value_1</Value>
+        <Value Active="Y">new_custom_property_value_2</Value>
+    </Property>
+
+    <Property Code="GUI">
+        <Value Active="Y">property_value_2</Value>
+    </Property>
+</Properties>

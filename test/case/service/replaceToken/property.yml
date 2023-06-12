@@ -1,0 +1,8 @@
+root:
+  db:
+    host: db_hostname
+    port: 3333
+    server: db_server
+    database: dev
+  env:
+    type: ${ENV_TYPE}
