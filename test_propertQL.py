@@ -1,7 +1,7 @@
 import unittest
 
-from deployment.scripts.service.propertyQL import apply_config
-from deployment.scripts.utils.file_utils import read_file, read_yaml_file, write_file
+from service.propertyQL import apply_config
+from utils.file_utils import read_file, read_yaml_file, write_file
 
 
 class xmlQLTestCases(unittest.TestCase):

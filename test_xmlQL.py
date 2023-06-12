@@ -1,8 +1,8 @@
 import unittest
 
-from deployment.scripts.service.xmlQL import apply_config
-from deployment.scripts.utils.file_utils import read_xml_file, read_yaml_file
-from deployment.scripts.utils.xml_utils import xml_prettify
+from service.xmlQL import apply_config
+from utils.file_utils import read_xml_file, read_yaml_file
+from utils.xml_utils import xml_prettify
 
 
 class xmlQLTestCases(unittest.TestCase):

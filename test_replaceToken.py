@@ -1,7 +1,7 @@
 import os
 import unittest
 
-from deployment.scripts.utils.file_utils import read_file, read_yaml_file, write_file
+from utils.file_utils import read_file, read_yaml_file, write_file
 from service.replaceToken import *
 
 
