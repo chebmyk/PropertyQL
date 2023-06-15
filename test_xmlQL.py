@@ -6,6 +6,22 @@ from utils.xml_utils import xml_prettify
 
 
 class xmlQLTestCases(unittest.TestCase):
+
+
+    def test_delete_tag(self):
+        xml_tree = read_xml_file("test/case/service/xmlQL/properties.xml")
+        query = read_yaml_file("test/case/service/xmlQL/delete/delete_element.ql")
+        output = apply_config(xml_tree, query)
+        expected = read_xml_file("test/case/service/xmlQL/delete/delete_element_output.xml")
+        self.assertEqual(output, xml_prettify(expected))
+
+    def test_delete_attribute(self):
+        xml_tree = read_xml_file("test/case/service/xmlQL/properties.xml")
+        query = read_yaml_file("test/case/service/xmlQL/delete/delete_attribute.ql")
+        output = apply_config(xml_tree, query)
+        expected = read_xml_file("test/case/service/xmlQL/delete/delete_attribute_output.xml")
+        self.assertEqual(output, xml_prettify(expected))
+
     def test_update_tag(self):
         xml_tree = read_xml_file("test/case/service/xmlQL/properties.xml")
         query = read_yaml_file("test/case/service/xmlQL/update/update_tag_value.ql")
