@@ -1,10 +1,11 @@
 import re
+import traceback
+from datetime import datetime
 import tkinter as tk
 from idlelib.colorizer import ColorDelegator
 from idlelib.percolator import Percolator
 
 import yaml
-
 import service.propertyQL
 import service.xmlQL
 import utils.file_utils as file_utils
@@ -61,9 +62,7 @@ class PropertyQLDeveloper:
 
 #=======================================================================
 
-
         self.input_field = tk.Text(self.layout_frame, undo=True)
-
         self.cdg = ColorDelegator()
        # self.cdg.prog = re.compile(r"\b(?P<tags>property\b|" + make_pat(), re.S)
        # self.cdg.prog = re.compile(r"\b(?P<MYGROUP>tkinter)\b|" + ic.make_pat(), re.S)
@@ -101,46 +100,70 @@ class PropertyQLDeveloper:
         Percolator(self.result_field).insertfilter(ColorDelegator())
         self.result_field.grid(row=3, columnspan=2, sticky=tk.N + tk.W + tk.E + tk.S, padx=5, pady=5)
 
+
+        #=======================================================================
+
+        self.output_field_label = tk.Label(self.layout_frame, text="Output")
+        self.output_field_label.grid(row=4, column=0, sticky=tk.W)
+
+        self.clear_output = tk.Button(self.layout_frame, image=clr_btn_icon, relief=tk.FLAT, command=self.clear_output)
+        self.clear_output.grid(row=4, column=1, sticky=tk.E)
+
+        self.output_field = tk.Text(self.layout_frame)
+        Percolator(self.output_field).insertfilter(ColorDelegator())
+        self.output_field.grid(row=5, columnspan=2, sticky=tk.N + tk.W + tk.E + tk.S, padx=5, pady=5)
+
         self.root.mainloop()
 
 
     def clear_result(self):
         self.result_field.delete("1.0", tk.END)
 
+    def clear_output(self):
+        self.output_field.delete("1.0", tk.END)
 
     def execute(self):
 
-        self.result_field.delete("1.0", tk.END)
+        try:
+            self.result_field.delete("1.0", tk.END)
+            self.output_field.delete("1.0", tk.END)
 
-        input_type=self.selected_file_type.get()
+            input_type=self.selected_file_type.get()
 
-        input_str = self.input_field.get("1.0", tk.END)
-        query_str = self.query_field.get("1.0", tk.END)
+            input_str = self.input_field.get("1.0", tk.END)
+            query_str = self.query_field.get("1.0", tk.END)
 
-        if input_type in ["xml"]:
-            xml_tree = xml_utils.parse_xml(input_str)
-            query = yaml.safe_load(query_str)
-            xml_tree = service.xmlQL.apply_config(xml_tree, query)
-            self.result_field.insert("1.0", xml_tree)
+            if input_type in ["xml"]:
+                xml_tree = xml_utils.parse_xml(input_str)
+                query = yaml.safe_load(query_str)
+                xml_tree = service.xmlQL.apply_config(xml_tree, query)
+                self.result_field.insert("1.0", xml_tree)
 
-        elif input_type in ["properties"]:
+            elif input_type in ["properties"]:
 
-            input_file_path = "input.tmp"
-            output_file_path = "output.tmp"
+                input_file_path = "input.tmp"
+                output_file_path = "output.tmp"
 
-            input_file = file_utils.write_file(input_file_path)
-            input_file.write(input_str)
-            input_file.close()
+                input_file = file_utils.write_file(input_file_path)
+                input_file.write(input_str)
+                input_file.close()
 
-            input_file = file_utils.read_file(input_file_path)
-            query = yaml.safe_load(query_str)
+                input_file = file_utils.read_file(input_file_path)
+                query = yaml.safe_load(query_str)
 
-            output_file = service.propertyQL.apply_config(input_file, query, file_utils.write_file(output_file_path))
-            output_file.close()
+                output_file = service.propertyQL.apply_config(input_file, query, file_utils.write_file(output_file_path))
+                output_file.close()
 
-            output = file_utils.read_file(output_file_path).read()
-            self.result_field.insert("1.0", output)
-            input_file.close()
+                output = file_utils.read_file(output_file_path).read()
+                self.result_field.insert("1.0", output)
+                input_file.close()
+
+        except Exception as err:
+            self.output_field.insert("1.0",  self.get_timestamp() + ': '+ traceback.format_exc())
+
+
+    def get_timestamp(self):
+        return datetime.now().isoformat()
 
 
     def text_onchange(self, event):

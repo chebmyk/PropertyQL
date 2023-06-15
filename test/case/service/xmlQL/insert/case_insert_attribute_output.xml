@@ -1,10 +1,9 @@
 <?xml version="1.0" ?>
 <Properties>
     <!-- Property with code = SERVICE CODE -->
-    <Property Code="SERVICE">
-        <Value Active="Y">new_updated_property</Value>
+    <Property Code="SERVICE" Valid="true">
+        <Value Active="Y">property_value_1</Value>
     </Property>
-
     <Property Code="GUI">
         <Value Active="Y">property_value_2</Value>
     </Property>

@@ -1,7 +1,6 @@
 import pathlib
 import shutil
 import sys
-
 import service.propertyQL
 import service.xmlQL
 from utils.file_utils import *

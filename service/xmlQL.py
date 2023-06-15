@@ -1,10 +1,20 @@
 import logging
 from typing import Optional
-
 from lxml import etree
 from service.replaceToken import replace_env_variable
 from utils.file_utils import *
 from utils.xml_utils import *
+
+
+class DeleteQuery:
+    delete: str
+    element: str
+    where: Optional[str] = None
+    def __init__(self, **entries):
+        self.delete = replace_env_variable(entries['delete'])
+        self.element = replace_env_variable(entries['element'])
+        if 'where' in entries:
+            self.where = replace_env_variable(entries['where'])
 
 
 class InsertQuery:
@@ -27,18 +37,25 @@ class UpdateQuery:
     update: str
     field: str
     value: str
-    where: str
+    where: Optional[str] = None
     def __init__(self, **entries):
         self.update = replace_env_variable(entries['update'])
         self.field = entries['field']
         self.value = replace_env_variable(entries['value'])
-        self.where = replace_env_variable(entries['where'])
+        if 'where' in entries:
+            self.where = replace_env_variable(entries['where'])
 
 
 class Query:
+    delete = []
     update = []
     insert = []
     def __init__(self, **entries):
+        if 'delete' in entries:
+            self.delete = []
+            for dlt in entries['delete']:
+                self.delete.append(DeleteQuery(**dlt))
+
         if 'update' in entries:
             self.update = []
             for upd in entries['update']:
@@ -54,12 +71,36 @@ def apply_config(xml_tree, query):
 
     #todo validate inputs
 
-    queries = None
-
     queries = Query(**query)
 
-    for updateQuery in queries.update:
+    for deleteQuery in queries.delete:
+        entry = list(filter(lambda elem: len(elem.xpath(deleteQuery.where)) > 0, xml_tree.xpath(f"{deleteQuery.delete}")))
+        if len(entry) == 1 :
+            print(f"Delete from Object: {etree.tostring(entry[0])}")
+            found = entry[0].xpath(deleteQuery.element)
+            if found:
+                element = found[0]
+                print(f"Found {type(element)}")
+                if isinstance(element, elTree._Element):
+                    element.getparent().remove(element)
+                else:
+                    print(f"Elememt{element}")
+                    start = deleteQuery.element.rindex("@")
+                    attribute_name = deleteQuery.element[start+1:]
+                    element.getparent().attrib.pop(attribute_name, None)
+            else:
+                logging.warning(f"Updated field [{deleteQuery.element}] doesn't exists")
 
+        elif len(entry) == 0 :
+            logging.warning("No Records found to delete")
+            logging.warning(f"{deleteQuery.delete} where [{deleteQuery.where}]")
+        else:
+            logging.error(f"Incorrect delete query. Multiple Delete is not supported. {deleteQuery.delete} where [{deleteQuery.where}]")
+            raise Exception("Error occurred while running delete stmt")
+
+
+
+    for updateQuery in queries.update:
         entry = list(filter(lambda elem: len(elem.xpath(updateQuery.where)) > 0, xml_tree.xpath(f"{updateQuery.update}")))
         if len(entry) == 1 :
             print(f"Update Object: {etree.tostring(entry[0])}")
@@ -100,12 +141,12 @@ def apply_config(xml_tree, query):
                 targetElement.append(newElement)
                 print(f"value ({etree.tostring(newElement)})")
             elif insertQuery.attribute:
-                print(f"insert into {xml_tree.getpath(targetElement)}")
+                print(f"insert into {targetElement}")
                 print(f"attribute:{insertQuery.attribute['name']} value:{insertQuery.attribute['value']}")
                 targetElement.set(insertQuery.attribute['name'], insertQuery.attribute['value'])
                 print(f"value ({etree.tostring(targetElement)})")
         elif len(entry) == 0:
-            logging.warning(f"Warning: Target Element not found {etree.tostring(insertQuery.insert)}")
+            logging.warning(f"Warning: Target Element not found {insertQuery.insert}")
         else:
             logging.error(f"Incorrect Insert query. You are trying to insert into multiple tags. Please check insert statement {etree.tostring(insertQuery.insert)}")
             raise Exception("Error: occurred while running insert stmt")
