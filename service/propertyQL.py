@@ -1,48 +1,9 @@
 import logging
 import re
-from typing import Optional
-
-from service.replaceToken import replace_env_variable
-from utils.file_utils import *
-
-
-class InsertQuery:
-    insert: str
-    value: str
-    comment: Optional[str] = None
-    def __init__(self, **entries):
-        self.insert = entries['insert']
-        self.value = replace_env_variable(entries['value'])
-        if 'comment' in entries:
-            self.comment = entries['comment']
-
-
-class UpdateQuery:
-    update: str
-    value: str
-    def __init__(self, **entries):
-        self.update = entries['update']
-        self.value = replace_env_variable(entries['value'])
-
-
-
-class Query:
-    update = []
-    insert = []
-    def __init__(self, **entries):
-        if 'update' in entries:
-            self.update = []
-            for upd in entries['update']:
-                self.update.append(UpdateQuery(**upd))
-        if 'insert' in entries:
-            self.insert = []
-            for ins in entries['insert']:
-                    self.insert.append(InsertQuery(**ins))
+from model.query.properties.propertiesQuery import Query
 
 
 def apply_config(input_file, query, output_file):
-
-    #todo validate inputs
 
     queries = Query(**query)
 

@@ -3,7 +3,9 @@
 
 Project is design to provide an ability to modify configuration files based on xml or  property format
 
-Query file may contain placeholder like **${ENV_VAR}** which will be replaced with real environment variable before execution
+Supported actions are INSERT, UPDATE, DELETE
+
+Query file may contain placeholder like **${ENV_VAR}** which will be replaced (if it exists) with real environment variable before execution
 
 # **UI** 
 

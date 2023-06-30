@@ -1,7 +1,4 @@
-import os
 import unittest
-
-from utils.file_utils import read_file, read_yaml_file, write_file
 from service.replaceToken import *
 
 

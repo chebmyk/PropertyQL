@@ -7,7 +7,7 @@ from idlelib.percolator import Percolator
 
 import yaml
 import service.propertyQL
-import service.xmlQL
+import service.xmlQL as xql
 import utils.file_utils as file_utils
 import utils.xml_utils as xml_utils
 
@@ -22,19 +22,21 @@ class PropertyQLDeveloper:
 
         # ==========  MENU =========================
         self.menu_frame = tk.Frame(self.root)
-        self.menu_frame.rowconfigure(0, weight=1)
+        self.menu_frame.rowconfigure(0, weight=1, minsize=20)
         self.menu_frame.pack(padx=10, pady=1, fill=tk.BOTH)
         btn_icon = tk.PhotoImage(file='icons/play.png')
         self.run_button = tk.Button(self.menu_frame, image=btn_icon, relief=tk.FLAT, command=self.execute)
-        self.run_button.grid(row=0, column=0, sticky=tk.E)
+        self.run_button.grid(row=0, column=0, sticky=tk.W)
 
         # ==========  Layout =========================
         self.layout_frame = tk.Frame(self.root)
 
-        self.layout_frame.rowconfigure(0, weight=1)
-        self.layout_frame.rowconfigure(1, weight=4)
-        self.layout_frame.rowconfigure(2, weight=1)
-        self.layout_frame.rowconfigure(3, weight=4)
+        self.layout_frame.rowconfigure(0, weight=1, minsize=20)
+        self.layout_frame.rowconfigure(1, weight=3)
+        self.layout_frame.rowconfigure(2, weight=1, minsize=20)
+        self.layout_frame.rowconfigure(3, weight=3)
+        self.layout_frame.rowconfigure(4, weight=1, minsize=20)
+        self.layout_frame.rowconfigure(5, weight=2)
 
         self.layout_frame.columnconfigure(0, weight=1)
         self.layout_frame.columnconfigure(1, weight=1)
@@ -66,8 +68,8 @@ class PropertyQLDeveloper:
         self.cdg = ColorDelegator()
        # self.cdg.prog = re.compile(r"\b(?P<tags>property\b|" + make_pat(), re.S)
        # self.cdg.prog = re.compile(r"\b(?P<MYGROUP>tkinter)\b|" + ic.make_pat(), re.S)
-        self.cdg.idprog = re.compile(r"\s+(\w+)", re.S)
-        self.cdg.tagdefs["MYGROUP"] = {"foreground": "blue", "background": "#FFFFFF"}
+       # self.cdg.idprog = re.compile(r"\s+(\w+)", re.S)
+       # self.cdg.tagdefs["MYGROUP"] = {"foreground": "blue", "background": "#FFFFFF"}
         self.cdg.tagdefs["COMMENT"] = {"foreground": "red", "background": "#FFFFFF"}
         self.cdg.tagdefs["KEYWORD"] = {"foreground": "yellow", "background": "#FFFFFF"}
         self.cdg.tagdefs["BUILTIN"] = {"foreground": "green", "background": "#FFFFFF"}
@@ -75,6 +77,9 @@ class PropertyQLDeveloper:
         self.cdg.tagdefs["DEFINITION"] = {"foreground": "purple", "background": "#FFFFFF"}
         self.cdg.tagdefs["CLASS"] = {"foreground": "black", "background": "#FFFFFF"}
 
+        self.cdg.tagdefs["TAG"] = {"foreground": "purple", "background": "#FFFFFF"}
+        self.cdg.tagdefs["ATTRIBUTE"] = {"foreground": "orange", "background": "#FFFFFF"}
+        self.cdg.tagdefs["VALUE"] = {"foreground": "brown", "background": "#FFFFFF"}
 
         Percolator(self.input_field).insertfilter(self.cdg)
 
@@ -119,8 +124,10 @@ class PropertyQLDeveloper:
     def clear_result(self):
         self.result_field.delete("1.0", tk.END)
 
+
     def clear_output(self):
         self.output_field.delete("1.0", tk.END)
+
 
     def execute(self):
 
@@ -136,7 +143,7 @@ class PropertyQLDeveloper:
             if input_type in ["xml"]:
                 xml_tree = xml_utils.parse_xml(input_str)
                 query = yaml.safe_load(query_str)
-                xml_tree = service.xmlQL.apply_config(xml_tree, query)
+                xml_tree = xql.XMLQl(xml_tree, query).run()
                 self.result_field.insert("1.0", xml_tree)
 
             elif input_type in ["properties"]:
@@ -179,6 +186,7 @@ class PropertyQLDeveloper:
             print("Text detected as Property")
             self.selected_file_type.set("properties")
         self.input_field.edit_modified(False)
+
 
     def on_paste(self, event):
         print(f"On Paste event {event}")

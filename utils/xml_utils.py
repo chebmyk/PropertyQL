@@ -40,8 +40,9 @@ def element_to_xpath_list(_element_):
     xpath_list = []
 
     if not type(_element_) is etree._Comment:
-        xml_parser =  etree.XMLParser(remove_comments=True)
-        root =  etree.ElementTree(_element_, parser=xml_parser)
+
+        element_string = etree.tostring(_element_, encoding='utf-8', pretty_print=True)
+        root = parse_xml(element_string)
 
         sub_elements = root.xpath('//*')
         xpath_list = []
@@ -75,13 +76,16 @@ def check_duplicates(root, element):
     for child in sub_elements:
         if not type(child) is etree._Comment:
             current = element_to_xpath_list(child)
-            for tag in current:
-                # print(f"{tag['xpath']}: {tag['value']}")
-                if list(filter(lambda el: el['xpath'] == tag['xpath'].replace("/"+root.tag,"") and el['value'] == tag['value'], new_element)):
-                    has_duplicate = True
-                else:
-                    has_duplicate = False
-                    break
+
+            if len(new_element) == len(current):
+                for tag in current:
+                    # print(f"{tag['xpath']}: {tag['value']}")
+                    if list(filter(lambda el: el['xpath'] == tag['xpath'].replace("/"+root.tag,"") and el['value'] == tag['value'], new_element)):
+                        has_duplicate = True
+                    else:
+                        has_duplicate = False
+                        break
+
             if has_duplicate:
                 break
     return has_duplicate

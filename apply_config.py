@@ -30,7 +30,7 @@ if __name__ == '__main__':
         xml_tree = read_xml_file(file_path)
         query = read_yaml_file(query_path)
 
-        xml_tree = service.xmlQL.apply_config(xml_tree, query)
+        xml_tree = service.XMLQl(xml_tree, query).apply_config()
 
         shutil.copy2(file_path, file_path + ".default")
         write_file(file_path).write(xml_tree)
