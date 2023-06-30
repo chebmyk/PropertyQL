@@ -77,7 +77,7 @@ def check_duplicates(root, element):
         if not type(child) is etree._Comment:
             current = element_to_xpath_list(child)
 
-            if len(new_element) == len(current):
+            if len(new_element) == len(current):  # strict equals  ()
                 for tag in current:
                     # print(f"{tag['xpath']}: {tag['value']}")
                     if list(filter(lambda el: el['xpath'] == tag['xpath'].replace("/"+root.tag,"") and el['value'] == tag['value'], new_element)):

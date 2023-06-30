@@ -1,0 +1,30 @@
+<?xml version="1.0" ?>
+<Servers>
+    <!-- Some comment allowed here -->
+    <Server Code="Root">
+        <Configurations>
+            <Configuration id="dev">
+                <Service Active="Y">Service name1</Service>
+                <Service Active="Y">Service name2</Service>
+                <Service Active="Y">Service name3</Service>
+            </Configuration>
+            <Configuration id="sit">
+                <Service Active="Y">Service name11</Service>
+                <Service Active="Y">Service name22</Service>
+                <Service Active="Y">Service name33</Service>
+            </Configuration>
+            <Configuration id="uat">
+                <Service Active="Y">Service name11</Service>
+                <Service Active="Y">Service name22</Service>
+                <Service Active="Y">Service name33</Service>
+            </Configuration>
+        </Configurations>
+    </Server>
+    <Server Code="Mail">
+        <Configuration>
+            <Property Active="Y">property_value_1</Property>
+            <Property host="Y">property_value_1</Property>
+            <Property port="Y">property_value_1</Property>
+        </Configuration>
+    </Server>
+</Servers>
