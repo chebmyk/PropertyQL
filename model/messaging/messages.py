@@ -14,20 +14,20 @@ class Message:
 
 
 class LogMessage:
-    def logInfo(self, message) -> Message:
+    def info(self, message) -> Message:
         msg = Message(Topic.LOG, {'logLevel': "INFO",'message': message})
         return msg
 
-    def logWarn(self, message) -> Message:
+    def warning(self, message) -> Message:
         msg = Message(Topic.LOG, {'logLevel': "WARNING",'message': message})
         return msg
 
-    def logError(self, message) -> Message:
+    def error(self, message) -> Message:
         msg = Message(Topic.LOG, {'logLevel': "ERROR",'message': message})
         return msg
 
 
-
+logMsg = LogMessage()
 
 
 class Observer:

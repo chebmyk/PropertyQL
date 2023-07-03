@@ -3,7 +3,8 @@ from model.messaging.messages import Message, Observer
 
 class MessageService:
     subscribers = set()
-    def publish_event(self, message: Message):
+
+    def publish(self, message: Message):
         for subscriber in self.subscribers:
             subscriber.update(message)
 

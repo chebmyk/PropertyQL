@@ -1,4 +1,5 @@
 import re
+import sys
 import traceback
 from datetime import datetime
 import tkinter as tk
@@ -10,9 +11,25 @@ import service.propertyQL
 import service.xmlQL as xql
 import utils.file_utils as file_utils
 import utils.xml_utils as xml_utils
+from model.messaging.messages import Observer, Message, Topic
+
+
+class ExecObserver(Observer):
+
+    outputComponent : tk.Text
+
+    def __init__(self, outputComponent):
+        self.outputComponent = outputComponent
+
+    def update(self, message: Message):
+        if message.topic == Topic.LOG:
+            self.outputComponent.insert(tk.END,  '\n' + datetime.now().isoformat() + ': ' + message.body['logLevel'] + ' '+ message.body['message'])
 
 
 class PropertyQLDeveloper:
+
+    xml_Query = xql.XMLQl()
+
 
     def __init__(self):
         self.root = tk.Tk()
@@ -28,7 +45,7 @@ class PropertyQLDeveloper:
         self.run_button = tk.Button(self.menu_frame, image=btn_icon, relief=tk.FLAT, command=self.execute)
         self.run_button.grid(row=0, column=0, sticky=tk.W)
 
-        # ==========  Layout =========================
+        # ==========  Layout =====================================================
         self.layout_frame = tk.Frame(self.root)
 
         self.layout_frame.rowconfigure(0, weight=1, minsize=20)
@@ -43,14 +60,14 @@ class PropertyQLDeveloper:
 
         self.layout_frame.pack(padx=10, pady=10, fill=tk.BOTH)
 
-#=============================================================================
+        #=========================================================================
         self.input_labels_frame = tk.Frame(self.layout_frame)
         self.input_labels_frame.rowconfigure(0, weight=1)
         self.input_labels_frame.columnconfigure(0, weight=8)
         self.input_labels_frame.columnconfigure(1, weight=1)
         self.input_labels_frame.columnconfigure(2, weight=1)
 
-#=========================================================================
+        #=========================================================================
         self.input_field_label = tk.Label(self.input_labels_frame, text="Input")
         self.input_field_label.grid(row=0, column=0, sticky=tk.W)
 
@@ -62,14 +79,10 @@ class PropertyQLDeveloper:
         self.query_field_label = tk.Label(self.layout_frame, text="Query")
         self.query_field_label.grid(row=0, column=1, sticky=tk.W)
 
-#=======================================================================
+        #=========================================================================
 
         self.input_field = tk.Text(self.layout_frame, undo=True)
         self.cdg = ColorDelegator()
-       # self.cdg.prog = re.compile(r"\b(?P<tags>property\b|" + make_pat(), re.S)
-       # self.cdg.prog = re.compile(r"\b(?P<MYGROUP>tkinter)\b|" + ic.make_pat(), re.S)
-       # self.cdg.idprog = re.compile(r"\s+(\w+)", re.S)
-       # self.cdg.tagdefs["MYGROUP"] = {"foreground": "blue", "background": "#FFFFFF"}
         self.cdg.tagdefs["COMMENT"] = {"foreground": "red", "background": "#FFFFFF"}
         self.cdg.tagdefs["KEYWORD"] = {"foreground": "yellow", "background": "#FFFFFF"}
         self.cdg.tagdefs["BUILTIN"] = {"foreground": "green", "background": "#FFFFFF"}
@@ -92,7 +105,7 @@ class PropertyQLDeveloper:
         Percolator(self.query_field).insertfilter(ColorDelegator())
         self.query_field.grid(row=1, column=1, padx=5, pady=5, sticky=tk.W + tk.E)
 
-#=======================================================================
+        #==========================================================================
 
         self.result_field_label = tk.Label(self.layout_frame, text="Result")
         self.result_field_label.grid(row=2, column=0, sticky=tk.W)
@@ -105,8 +118,7 @@ class PropertyQLDeveloper:
         Percolator(self.result_field).insertfilter(ColorDelegator())
         self.result_field.grid(row=3, columnspan=2, sticky=tk.N + tk.W + tk.E + tk.S, padx=5, pady=5)
 
-
-        #=======================================================================
+        #=========================================================================
 
         self.output_field_label = tk.Label(self.layout_frame, text="Output")
         self.output_field_label.grid(row=4, column=0, sticky=tk.W)
@@ -117,6 +129,9 @@ class PropertyQLDeveloper:
         self.output_field = tk.Text(self.layout_frame)
         Percolator(self.output_field).insertfilter(ColorDelegator())
         self.output_field.grid(row=5, columnspan=2, sticky=tk.N + tk.W + tk.E + tk.S, padx=5, pady=5)
+
+        self.outputObserver = ExecObserver(self.output_field)
+        self.xml_Query.messageService.subscribe(self.outputObserver)
 
         self.root.mainloop()
 
@@ -136,14 +151,13 @@ class PropertyQLDeveloper:
             self.output_field.delete("1.0", tk.END)
 
             input_type=self.selected_file_type.get()
-
             input_str = self.input_field.get("1.0", tk.END)
             query_str = self.query_field.get("1.0", tk.END)
 
             if input_type in ["xml"]:
                 xml_tree = xml_utils.parse_xml(input_str)
                 query = yaml.safe_load(query_str)
-                xml_tree = xql.XMLQl(xml_tree, query).run()
+                xml_tree = self.xml_Query.run(xml_tree, query)
                 self.result_field.insert("1.0", xml_tree)
 
             elif input_type in ["properties"]:
@@ -166,7 +180,8 @@ class PropertyQLDeveloper:
                 input_file.close()
 
         except Exception as err:
-            self.output_field.insert("1.0",  self.get_timestamp() + ': '+ traceback.format_exc())
+            self.output_field.insert(tk.END,  "\n " + self.get_timestamp() + ': ' + traceback.format_exc())
+            print( "Error:" + self.get_timestamp() + ': '+ traceback.format_exc())
 
 
     def get_timestamp(self):
@@ -174,7 +189,6 @@ class PropertyQLDeveloper:
 
 
     def text_onchange(self, event):
-        print(f"Onchange text event {event}" )
         input_str = self.input_field.get("1.0", tk.END)
 
         xml_match = re.findall(r'<\w+[^>]*>', input_str)
@@ -189,7 +203,6 @@ class PropertyQLDeveloper:
 
 
     def on_paste(self, event):
-        print(f"On Paste event {event}")
         self.input_field.insert(tk.END, "")
         self.input_field.edit_modified(True)
 
