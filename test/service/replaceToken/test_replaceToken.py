@@ -1,5 +1,8 @@
+import os
 import unittest
-from service.replaceToken import *
+
+from mql.service.replaceToken import replace_token, replace_env_variable
+from mql.utils.file_utils import read_yaml_file, read_file, write_file
 
 
 class ReplaceTokenTestCase(unittest.TestCase):

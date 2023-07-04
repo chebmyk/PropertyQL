@@ -1,7 +1,6 @@
 import sys
-from utils.file_utils import *
-from service.replaceToken import *
-import logging
+from mql.utils.file_utils import *
+
 
 def validate_input_params(_params_):
     if len(_params_) < 2:

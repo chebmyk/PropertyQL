@@ -1,6 +1,6 @@
 import re
 import sys
-from utils.file_utils import *
+from mql.utils.file_utils import *
 
 #from jproperties import Properties
 

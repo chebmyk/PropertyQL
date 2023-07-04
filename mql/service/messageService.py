@@ -1,4 +1,4 @@
-from model.messaging.messages import Message, Observer
+from mql.model.messaging.messages import Message, Observer
 
 
 class MessageService:

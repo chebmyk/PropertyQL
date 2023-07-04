@@ -1,7 +1,7 @@
 import re
-from model.messaging.messages import ConsoleLogObserver, logMsg
-from model.query.properties.propertiesQuery import *
-from service.messageService import MessageService
+from mql.model.messaging.messages import ConsoleLogObserver, logMsg
+from mql.model.query.properties.propertiesQuery import Query, property_regexp_pattern
+from mql.service.messageService import MessageService
 
 
 class PropertyQL:

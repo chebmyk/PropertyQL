@@ -1,5 +1,5 @@
 from typing import Optional
-from service.replaceToken import replace_env_variable
+from mql.service.replaceToken import replace_env_variable
 
 
 class Query:

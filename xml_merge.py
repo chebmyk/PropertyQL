@@ -1,11 +1,9 @@
-import re
 import sys
-from lxml import etree
 import re
 
 
-from utils.file_utils import *
-from utils.xml_utils import *
+from property_ql.utils.file_utils import *
+from property_ql.utils.xml_utils import *
 
 
 def validate_input_params(_params_):

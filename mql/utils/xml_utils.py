@@ -1,5 +1,4 @@
 import xml.dom.minidom
-
 from lxml import etree
 
 

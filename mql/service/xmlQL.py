@@ -1,9 +1,8 @@
-import logging
-from model.messaging.messages import ConsoleLogObserver, logMsg
-from model.query.xml.xmlQuery import Query
-from service.messageService import *
-from utils.file_utils import *
-from utils.xml_utils import *
+from mql.model.messaging.messages import ConsoleLogObserver, logMsg
+from mql.model.query.xml.xmlQuery import Query
+from mql.service.messageService import MessageService
+from mql.utils.file_utils import *
+from mql.utils.xml_utils import *
 
 
 class XMLQl:

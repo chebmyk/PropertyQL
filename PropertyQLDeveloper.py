@@ -1,5 +1,4 @@
 import re
-import sys
 import traceback
 from datetime import datetime
 import tkinter as tk
@@ -7,11 +6,9 @@ from idlelib.colorizer import ColorDelegator
 from idlelib.percolator import Percolator
 
 import yaml
-import service.propertyQL as pql
-import service.xmlQL as xql
-import utils.file_utils as file_utils
-import utils.xml_utils as xml_utils
-from model.messaging.messages import Observer, Message, Topic
+from mql.service import propertyQL as pql, xmlQL as xql
+import mql.utils.xml_utils as xml_utils
+from mql.model.messaging.messages import Observer, Message, Topic
 
 
 class ExecObserver(Observer):

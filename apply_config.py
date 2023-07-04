@@ -1,9 +1,8 @@
 import pathlib
 import shutil
 import sys
-import service.propertyQL as pql
-import service.xmlQL as xql
-from utils.file_utils import *
+from mql.service  import propertyQL as pql, xmlQL as xql
+from mql.utils.file_utils import *
 
 
 def validate_input_params(_params_):
