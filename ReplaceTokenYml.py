@@ -1,4 +1,6 @@
 import sys
+
+from mql.service.replaceToken import replace_token
 from mql.utils.file_utils import *
 
 

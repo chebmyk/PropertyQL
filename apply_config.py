@@ -1,7 +1,7 @@
 import pathlib
 import shutil
 import sys
-from mql.service  import propertyQL as pql, xmlQL as xql
+from mql.service import propertyQL as pql, xmlQL as xql
 from mql.utils.file_utils import *
 
 
