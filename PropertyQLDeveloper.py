@@ -7,7 +7,7 @@ from idlelib.colorizer import ColorDelegator
 from idlelib.percolator import Percolator
 
 import yaml
-import service.propertyQL
+import service.propertyQL as pql
 import service.xmlQL as xql
 import utils.file_utils as file_utils
 import utils.xml_utils as xml_utils
@@ -29,6 +29,7 @@ class ExecObserver(Observer):
 class PropertyQLDeveloper:
 
     xml_Query = xql.XMLQl()
+    property_Query = pql.PropertyQL()
 
 
     def __init__(self):
@@ -159,25 +160,12 @@ class PropertyQLDeveloper:
                 query = yaml.safe_load(query_str)
                 xml_tree = self.xml_Query.run(xml_tree, query)
                 self.result_field.insert("1.0", xml_tree)
-
             elif input_type in ["properties"]:
-
-                input_file_path = "input.tmp"
-                output_file_path = "output.tmp"
-
-                input_file = file_utils.write_file(input_file_path)
-                input_file.write(input_str)
-                input_file.close()
-
-                input_file = file_utils.read_file(input_file_path)
+                #properties = list(map(lambda line: line + "\n", input_str.splitlines()))
+                properties =  input_str.splitlines(keepends=True)
                 query = yaml.safe_load(query_str)
-
-                output_file = service.propertyQL.apply_config(input_file, query, file_utils.write_file(output_file_path))
-                output_file.close()
-
-                output = file_utils.read_file(output_file_path).read()
-                self.result_field.insert("1.0", output)
-                input_file.close()
+                output = self.property_Query.run(properties, query)
+                self.result_field.insert("1.0", "".join(output))
 
         except Exception as err:
             self.output_field.insert(tk.END,  "\n " + self.get_timestamp() + ': ' + traceback.format_exc())

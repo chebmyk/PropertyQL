@@ -1,8 +1,8 @@
 import pathlib
 import shutil
 import sys
-import service.propertyQL
-import service.xmlQL
+import service.propertyQL as pql
+import service.xmlQL as xql
 from utils.file_utils import *
 
 
@@ -30,23 +30,21 @@ if __name__ == '__main__':
         xml_tree = read_xml_file(file_path)
         query = read_yaml_file(query_path)
 
-        xml_tree = service.XMLQl(xml_tree, query).apply_config()
+        xml_tree = xql.XMLQl().run(xml_tree, query)
 
         shutil.copy2(file_path, file_path + ".default")
         write_file(file_path).write(xml_tree)
 
     elif file_extension in [".properties",".sh",".props"]:
 
-        output_file_path = "output.tmp"
-
-        input_file = read_file(file_path)
+        properties = read_file(file_path)
         query = read_yaml_file(query_path)
-        output_file = write_file(output_file_path)
 
-        output_file = service.propertyQL.apply_config(input_file, query, output_file)
-        output_file.close()
+        updated_properties = pql.PropertyQL().run(properties, query)
 
         shutil.copy2(file_path, file_path + ".default")
-        shutil.copy2(output_file_path, file_path)
+
+        write_file(file_path).write("".join(updated_properties))
+
     else:
         raise Exception(f"Config files with extension [{file_extension}] are not supported")
