@@ -15,9 +15,9 @@ class Tag:
 
 class LogTags:
     tags = [
-        Tag({"tag_name": "property", "pattern": r'(INFO)', "foreground": 'blue'}),
-        Tag({"tag_name": "value", "pattern": r'(WARNING)', "foreground": 'orange'}),
-        Tag({"tag_name": "value", "pattern": r'(ERROR)', "foreground": 'red'}),
+        Tag({"tag_name": "info", "pattern": r'(INFO)', "foreground": 'blue'}),
+        Tag({"tag_name": "warning", "pattern": r'(WARNING)', "foreground": 'orange'}),
+        Tag({"tag_name": "error", "pattern": r'(ERROR)', "foreground": 'red'}),
         Tag({"tag_name": "time", "pattern": r'\d{4}-\d{2}-\d{2}.\d{2}:\d{2}:\d{2}.\d{6}', "foreground": 'grey'}),
 
     ]
@@ -34,19 +34,19 @@ class QueryTags:
 
 class XMLTags:
     tags = [
-        Tag({"tag_name": "comment", "pattern": r'<!--.*-->', "foreground": 'gray'}),
         Tag({"tag_name": "element1", "pattern": r'<([^/\s>]+)', "foreground": 'blue'}),
         Tag({"tag_name": "element2", "pattern": r'</([^/\s>]+)>', "foreground": 'blue'}),
         Tag({"tag_name": "attribute", "pattern": r'(\w+)=["\'][^"\']*["\']', "foreground": 'orange'}),
         Tag({"tag_name": "value", "pattern": r'["\']([^"\']*)["\']', "foreground": 'green'}),
+        Tag({"tag_name": "comment", "pattern": r'<!--.*-->', "foreground": 'gray'})
     ]
 
 
 class PropertyTags:
     tags = [
-        Tag({"tag_name": "comment", "pattern": r'(#.*)', "foreground": 'gray'}),
         Tag({"tag_name": "property", "pattern": r'(\w+=)', "foreground": 'blue'}),
         Tag({"tag_name": "value", "pattern": r'(=.*)', "foreground": 'orange'}),
+        Tag({"tag_name": "comment", "pattern": r'(#.*)', "foreground": 'gray'}),
     ]
 
 
@@ -66,8 +66,4 @@ class TextHightlighter:
                 start = match.start()
                 end = match.end()
                 self.text.tag_add(tag.tag_name, f'1.0+{start}c', f'1.0+{end}c')
-
             self.text.tag_config(tag.tag_name, foreground=tag.foreground)
-
-
-
