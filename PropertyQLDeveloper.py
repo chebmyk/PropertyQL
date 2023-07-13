@@ -6,6 +6,8 @@ from idlelib.colorizer import ColorDelegator
 from idlelib.percolator import Percolator
 
 import yaml
+
+from TKTextHighlighter import TextHightlighter, XMLTags, QueryTags, PropertyTags, LogTags
 from mql.service import propertyQL as pql, xmlQL as xql
 import mql.utils.xml_utils as xml_utils
 from mql.model.messaging.messages import Observer, Message, Topic
@@ -80,27 +82,19 @@ class PropertyQLDeveloper:
         #=========================================================================
 
         self.input_field = tk.Text(self.layout_frame, undo=True)
-        self.cdg = ColorDelegator()
-        self.cdg.tagdefs["COMMENT"] = {"foreground": "red", "background": "#FFFFFF"}
-        self.cdg.tagdefs["KEYWORD"] = {"foreground": "yellow", "background": "#FFFFFF"}
-        self.cdg.tagdefs["BUILTIN"] = {"foreground": "green", "background": "#FFFFFF"}
-        self.cdg.tagdefs["STRING"] = {"foreground": "orange", "background": "#FFFFFF"}
-        self.cdg.tagdefs["DEFINITION"] = {"foreground": "purple", "background": "#FFFFFF"}
-        self.cdg.tagdefs["CLASS"] = {"foreground": "black", "background": "#FFFFFF"}
 
-        self.cdg.tagdefs["TAG"] = {"foreground": "purple", "background": "#FFFFFF"}
-        self.cdg.tagdefs["ATTRIBUTE"] = {"foreground": "orange", "background": "#FFFFFF"}
-        self.cdg.tagdefs["VALUE"] = {"foreground": "brown", "background": "#FFFFFF"}
-
-        Percolator(self.input_field).insertfilter(self.cdg)
-
+        TextHightlighter(self.input_field).highlight_syntax(XMLTags())
 
         self.input_field.bind("<<Modified>>", self.text_onchange)
         self.input_field.bind("<Control-v>", self.on_paste)
         self.input_field.grid(row=1, column=0, padx=5, pady=5, sticky=tk.W + tk.E)
 
+
         self.query_field = tk.Text(self.layout_frame, undo=True)
-        Percolator(self.query_field).insertfilter(ColorDelegator())
+
+        TextHightlighter(self.query_field).highlight_syntax(QueryTags())
+
+        self.query_field.bind('<KeyRelease>', self.query_onchange)
         self.query_field.grid(row=1, column=1, padx=5, pady=5, sticky=tk.W + tk.E)
 
         #==========================================================================
@@ -113,7 +107,7 @@ class PropertyQLDeveloper:
         self.clear_result.grid(row=2, column=1, sticky=tk.E)
 
         self.result_field = tk.Text(self.layout_frame)
-        Percolator(self.result_field).insertfilter(ColorDelegator())
+        TextHightlighter(self.result_field).highlight_syntax(XMLTags())
         self.result_field.grid(row=3, columnspan=2, sticky=tk.N + tk.W + tk.E + tk.S, padx=5, pady=5)
 
         #=========================================================================
@@ -125,12 +119,14 @@ class PropertyQLDeveloper:
         self.clear_output.grid(row=4, column=1, sticky=tk.E)
 
         self.output_field = tk.Text(self.layout_frame)
-        Percolator(self.output_field).insertfilter(ColorDelegator())
+
+        TextHightlighter(self.output_field).highlight_syntax(LogTags())
+
         self.output_field.grid(row=5, columnspan=2, sticky=tk.N + tk.W + tk.E + tk.S, padx=5, pady=5)
 
         self.outputObserver = ExecObserver(self.output_field)
         self.xml_Query.messageService.subscribe(self.outputObserver)
-
+        self.property_Query.messageService.subscribe(self.outputObserver)
         self.root.mainloop()
 
 
@@ -157,21 +153,28 @@ class PropertyQLDeveloper:
                 query = yaml.safe_load(query_str)
                 xml_tree = self.xml_Query.run(xml_tree, query)
                 self.result_field.insert("1.0", xml_tree)
+                TextHightlighter(self.result_field).highlight_syntax(XMLTags())
             elif input_type in ["properties"]:
-                #properties = list(map(lambda line: line + "\n", input_str.splitlines()))
                 properties =  input_str.splitlines(keepends=True)
                 query = yaml.safe_load(query_str)
                 output = self.property_Query.run(properties, query)
                 self.result_field.insert("1.0", "".join(output))
+                TextHightlighter(self.result_field).highlight_syntax(PropertyTags())
+
+            TextHightlighter(self.output_field).highlight_syntax(LogTags())
 
         except Exception as err:
-            self.output_field.insert(tk.END,  "\n " + self.get_timestamp() + ': ' + traceback.format_exc())
+            self.output_field.insert(tk.END,  "\n " + self.get_timestamp() + ': ERROR ' + traceback.format_exc())
             print( "Error:" + self.get_timestamp() + ': '+ traceback.format_exc())
+            TextHightlighter(self.output_field).highlight_syntax(LogTags())
 
 
     def get_timestamp(self):
         return datetime.now().isoformat()
 
+
+    def query_onchange(self, event):
+        TextHightlighter(self.query_field).highlight_syntax(QueryTags())
 
     def text_onchange(self, event):
         input_str = self.input_field.get("1.0", tk.END)
@@ -181,9 +184,11 @@ class PropertyQLDeveloper:
         if len(xml_match) > len(prop_match):
             print("Text detected as XML")
             self.selected_file_type.set("xml")
+            TextHightlighter(self.input_field).highlight_syntax(XMLTags())
         else:
             print("Text detected as Property")
             self.selected_file_type.set("properties")
+            TextHightlighter(self.input_field).highlight_syntax(PropertyTags())
         self.input_field.edit_modified(False)
 
 

@@ -6,9 +6,9 @@ from mql.service.messageService import MessageService
 
 class PropertyQL:
     consoleLog = ConsoleLogObserver()
-    messageService = MessageService()
 
     def __init__(self):
+        self.messageService = MessageService()
         self.messageService.subscribe(self.consoleLog)
 
     def run(self, properties, query: Query):

@@ -7,9 +7,10 @@ from mql.utils.xml_utils import *
 
 class XMLQl:
     consoleLog = ConsoleLogObserver()
-    messageService = MessageService()
+    # messageService = MessageService()
 
     def __init__(self):
+        self.messageService = MessageService()
         self.messageService.subscribe(self.consoleLog)
 
     def run(self, xml_tree, query):
@@ -104,7 +105,7 @@ class XMLQl:
                     targetElement.append(newElement)
                     self.messageService.publish(logMsg.info(f"value ({etree.tostring(newElement)})"))
                 elif insertQuery.attribute:
-                    self.messageService.publish(logMsg.info(f"insert into {targetElement}"))
+                    self.messageService.publish(logMsg.info(f"insert into {insertQuery.insert}"))
                     self.messageService.publish(logMsg.info(f"attribute:{insertQuery.attribute['name']} value:{insertQuery.attribute['value']}"))
                     targetElement.set(insertQuery.attribute['name'], insertQuery.attribute['value'])
                     self.messageService.publish(logMsg.info(f"value ({etree.tostring(targetElement)})"))

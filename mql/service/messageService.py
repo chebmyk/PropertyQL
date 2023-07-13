@@ -2,7 +2,9 @@ from mql.model.messaging.messages import Message, Observer
 
 
 class MessageService:
-    subscribers = set()
+    def __init__(self):
+        self.subscribers = set()
+
 
     def publish(self, message: Message):
         for subscriber in self.subscribers:
